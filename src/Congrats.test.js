@@ -2,11 +2,13 @@ import React from 'react';
 import Enzyme, { shallow } from 'enzyme'; // #Destructure shallow function from enzyme
 import EnzymeAdapter from 'enzyme-adapter-react-16';
 
-import { findByTestAttr } from '../test/testUtils';
+import { findByTestAttr, checkProps } from '../test/testUtils';
 import Congrats from './Congrats';
 
 // #Configure enzyme to use imported enzyme adapter
 Enzyme.configure({ adapter: new EnzymeAdapter() });
+
+const defaultProps = { success: false };
 
 /**
  * #Setup function that to make a shallow wrapper out of Congrats component
@@ -14,7 +16,8 @@ Enzyme.configure({ adapter: new EnzymeAdapter() });
  * props is empty object by default, use object because we need key/value pairs: e.g. success: true
  */
 const setup = (props={}) => {
-	return shallow(<Congrats {...props} />); // #Return shallow on Congrats component with whatever props are given, spread operator takes whatever is in props object and turns them into key/value pairs
+	const setupProps = { ...defaultProps, ...props };
+	return shallow(<Congrats {...setupProps} />); // #Return shallow on Congrats component with whatever props are given, spread operator takes whatever is in props object and turns them into key/value pairs
 };
 
 // #Test render without crashing
@@ -36,4 +39,10 @@ test('renders non-empty congrats message when `success` is true', () => {
 	const wrapper = setup({ success: true });
 	const message = findByTestAttr(wrapper, 'congrats-message');
 	expect(message.text().length).not.toBe(0);
+});
+
+// #Test to ensure that when we have the props we expect we will not get an error
+test('does not throw warning with expected props', () => {
+	const expectedProps = { success: false }; // #Check that props is boolean
+	checkProps(Congrats, expectedProps);
 });
